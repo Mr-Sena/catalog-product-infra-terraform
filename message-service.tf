@@ -20,9 +20,9 @@ resource "aws_sns_topic_subscription" "listen_catalog_emit" {
   topic_arn = aws_sns_topic.topic_catalog_emit.arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.terraform_catalog_queue.arn
-  
-  depends_on = [ aws_sns_topic.topic_catalog_emit, 
-  aws_sqs_queue.terraform_catalog_queue ]
+
+  depends_on = [aws_sns_topic.topic_catalog_emit,
+  aws_sqs_queue.terraform_catalog_queue]
 }
 
 
@@ -83,10 +83,10 @@ resource "aws_s3_bucket" "catalog_items_bucket" {
 ###
 
 
-resource "aws_lambda_function" "lambda_consumer_api_catalog" {
+resource "aws_lambda_function" "lambda_api_catalog_consumer" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
-  filename      = "node_src.zip"
+  filename      = "nodejs-service.zip"
   function_name = "lambdaConsumerApiCatalog"
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "index.handler"
@@ -114,8 +114,8 @@ data "aws_iam_policy_document" "assume_role" {
 
 
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  name                = "iam_for_lambda"
+  assume_role_policy  = data.aws_iam_policy_document.assume_role.json
   managed_policy_arns = [aws_iam_policy.FullS3.arn, aws_iam_policy.ExecuteSQSQueue.arn]
 }
 
@@ -146,14 +146,14 @@ resource "aws_iam_policy" "ExecuteSQSQueue" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = [
-              "sqs:ReceiveMessage",
-              "sqs:DeleteMessage",
-              "sqs:GetQueueAttributes",
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents"
-          ]
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
         Effect   = "Allow"
         Resource = "*"
       },
@@ -167,5 +167,5 @@ resource "aws_iam_policy" "ExecuteSQSQueue" {
 
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   event_source_arn = aws_sqs_queue.terraform_catalog_queue.arn
-  function_name    = aws_lambda_function.lambda_consumer_api_catalog.arn
+  function_name    = aws_lambda_function.lambda_api_catalog_consumer.arn
 }
