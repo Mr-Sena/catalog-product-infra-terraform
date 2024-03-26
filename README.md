@@ -21,15 +21,16 @@ Esse repositório declara o código fonte para provisionar o Datacenter AWS da i
 <img src="AWS-infra-diagram.png" alt="Arquitetura-AWS">
 </p>
 
+<br>
 
 ## Procedimentos para provisionar o datacenter: 
  
- Acessar a conta do usuário.
+ Acessar a conta do usuário AWS:
 ``` 
  aws login
 ``` 
 <br>
 
- Configurar a infra: 
+ Executar o provisionamento: 
 ``` 
  terrafrom apply
